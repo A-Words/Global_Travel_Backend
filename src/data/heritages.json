@@ -1,0 +1,26 @@
+{
+  "heritages": [
+    {
+      "id": "great-wall",
+      "name": "长城",
+      "location": "北京",
+      "country": "中国",
+      "category": ["文化遗产", "建筑"],
+      "description": "世界上最长的城墙和古代防御工事系统，横跨中国北部的雄伟建筑",
+      "imageUrl": "/assets/images/great-wall.jpg",
+      "hasVR": true,
+      "hasAR": true,
+      "yearInscribed": 1987,
+      "coordinates": {
+        "latitude": 40.4319,
+        "longitude": 116.5704
+      },
+      "tags": ["古代建筑", "军事防御", "世界七大奇迹"],
+      "visitingInfo": {
+        "bestTime": "春秋季节",
+        "duration": "2-3小时",
+        "ticketPrice": "￥40-120"
+      }
+    }
+  ]
+} 
