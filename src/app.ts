@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import heritageRoutes from './routes/heritageRoutes';
-import { testConnection } from './config/database';
-import { heritageModel } from './models/heritage';
-import { logger } from './config/logger';
+import tripRoutes from './routes/tripRoutes';
+import {testConnection} from './config/database';
+import {heritageModel} from './models/heritage';
+import {logger} from './config/logger';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api', heritageRoutes);
+app.use('/api/trips', tripRoutes);
 
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error(err.stack);
