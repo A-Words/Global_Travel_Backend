@@ -11,7 +11,7 @@ router.post('/generate', async (req, res) => {
         const userId = 'default-user';
         const plan = await tripModel.createPlan(userId, preferences);
         res.json(plan);
-    } catch (error) {
+    } catch (error: any) {
         logger.error('生成行程计划失败:', error);
         res.status(500).json({
             error: '生成行程计划失败',
