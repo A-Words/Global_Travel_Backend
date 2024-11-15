@@ -1,6 +1,7 @@
 import {pool} from '../config/database';
 import {SparkClient} from '../services/sparkClient';
 import {logger} from '../config/logger';
+import {RowDataPacket} from 'mysql2';
 
 interface TripPreference {
     destinations: string[];
@@ -14,7 +15,7 @@ export const tripModel = {
         const connection = await pool.getConnection();
         try {
             // 1. 获取目的地详细信息
-            const [destinations] = await connection.execute(
+            const [destinations] = await connection.execute<RowDataPacket[]>(
                 'SELECT * FROM heritages WHERE id IN (?)',
                 [preferences.destinations]
             );
@@ -31,7 +32,7 @@ export const tripModel = {
         要求：
         1. 合理安排游览顺序和时间
         2. 考虑景点之间的距离
-        3. 每个景点提供参观重点和建议
+        3. 记得返回目的地信息，每个景点提供参观重点和建议
         4. 根据兴趣主题突出相关内容
         5. 适当安排休息和用餐时间
       `;
@@ -59,10 +60,10 @@ export const tripModel = {
     },
 
     async getPlan(planId: string) {
-        const [rows] = await pool.execute(
+        const [rows] = await pool.execute<RowDataPacket[]>(
             'SELECT * FROM trip_plans WHERE id = ?',
             [planId]
         );
-        return rows[0];
+        return rows[0] as RowDataPacket;
     }
 };

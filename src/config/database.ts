@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import mysql from 'mysql2/promise';
-import { logger } from './logger';
+import {logger} from './logger';
 import heritagesData from '../data/heritages.json';
 
 dotenv.config();
@@ -22,7 +22,8 @@ export const testConnection = async () => {
     const connection = await pool.getConnection();
     logger.info('MySQL 数据库连接成功');
     connection.release();
-  } catch (error) {
+    return true;
+  } catch (error: any) {
     logger.error('MySQL 数据库连接失败:', {
       error: error,
       message: error.message,
@@ -33,7 +34,6 @@ export const testConnection = async () => {
     });
     return false;
   }
-  return true;
 };
 
 export const getFallbackData = () => {
