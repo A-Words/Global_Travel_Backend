@@ -109,5 +109,31 @@ export const userModel = {
         } finally {
             connection.release();
         }
+    },
+
+    async findByUsername(username: string) {
+        const connection = await pool.getConnection();
+        try {
+            const [users] = await connection.execute<RowDataPacket[]>(
+                'SELECT * FROM users WHERE username = ?',
+                [username]
+            );
+
+            if (users.length === 0) {
+                return null;
+            }
+
+            const user = users[0];
+            return {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            };
+        } catch (error) {
+            logger.error('查找用户失败:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 };
