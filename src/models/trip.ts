@@ -10,6 +10,14 @@ interface TripPreference {
     interests: string[];
 }
 
+interface TripPlan {
+    id: string;
+    preferences: TripPreference;
+    planContent: string;
+    status: 'pending' | 'completed' | 'failed';
+    createdAt: Date;
+}
+
 export const tripModel = {
     async createPlan(userId: string, preferences: TripPreference) {
         const connection = await pool.getConnection();
@@ -65,5 +73,54 @@ export const tripModel = {
             [planId]
         );
         return rows[0] as RowDataPacket;
+    },
+
+    async getUserTrips(userId: string) {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute<RowDataPacket[]>(
+                'SELECT id, preferences, plan_content as planContent, status, DATE_FORMAT(created_at, "%Y-%m-%dT%H:%i:%s.000Z") as createdAt FROM trip_plans WHERE user_id = ? ORDER BY created_at DESC',
+                [userId]
+            );
+
+            return rows.map(row => ({
+                id: row.id,
+                preferences: typeof row.preferences === 'string' ? JSON.parse(row.preferences) : row.preferences,
+                planContent: row.planContent,
+                status: row.status,
+                createdAt: row.createdAt
+            }));
+        } catch (error) {
+            logger.error('获取用户行程失败:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
+    },
+
+    async getTripById(tripId: string): Promise<TripPlan | null> {
+        const connection = await pool.getConnection();
+        try {
+            const [trips] = await connection.execute<RowDataPacket[]>(
+                'SELECT * FROM trip_plans WHERE id = ?',
+                [tripId]
+            );
+            if (trips.length === 0) {
+                return null;
+            }
+            const trip = trips[0];
+            return {
+                id: trip.id,
+                preferences: JSON.parse(trip.preferences),
+                planContent: trip.plan_content,
+                status: trip.status,
+                createdAt: trip.created_at
+            };
+        } catch (error) {
+            logger.error('获取行程详情失败:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 };
