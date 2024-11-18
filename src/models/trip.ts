@@ -24,8 +24,8 @@ export const tripModel = {
         try {
             // 1. 获取目的地详细信息
             const [destinations] = await connection.execute<RowDataPacket[]>(
-                'SELECT * FROM heritages WHERE id IN (?)',
-                [preferences.destinations]
+                `SELECT * FROM heritages WHERE id IN (${preferences.destinations.map(() => '?').join(',')})`,
+                [...preferences.destinations]
             );
 
             // 2. 调用星火大模型生成行程
