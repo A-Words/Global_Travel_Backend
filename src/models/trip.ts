@@ -22,11 +22,20 @@ export const tripModel = {
     async createPlan(userId: string, preferences: TripPreference) {
         const connection = await pool.getConnection();
         try {
-            // 1. 获取目的地详细信息
+            // 验证是否选择了目的地
+            if (!preferences.destinations || preferences.destinations.length === 0) {
+                throw new Error('未选择目的地');
+            }
+
+            // 1.验证所有目的地 ID 是否有效
             const [destinations] = await connection.execute<RowDataPacket[]>(
-                'SELECT * FROM heritages WHERE id IN (?)',
-                [preferences.destinations]
+                `SELECT * FROM heritages WHERE id IN (${preferences.destinations.map(() => '?').join(',')})`,
+                [...preferences.destinations]
             );
+
+            if (destinations.length !== preferences.destinations.length) {
+                throw new Error('部分目的地不存在');
+            }
 
             // 2. 调用星火大模型生成行程
             const spark = new SparkClient();

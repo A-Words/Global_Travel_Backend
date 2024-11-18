@@ -127,11 +127,65 @@ export const userModel = {
             return {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                avatar: user.avatar,
+                nickname: user.nickname
             };
         } catch (error) {
             logger.error('查找用户失败:', error);
             throw error;
+        } finally {
+            connection.release();
+        }
+    },
+
+    async updateSettings(userId: string, settings: { username: string; email: string; nickname?: string }) {
+        const connection = await pool.getConnection();
+        try {
+            const [result] = await connection.execute(
+                'UPDATE users SET username = ?, email = ?, nickname = ? WHERE id = ?',
+                [settings.username, settings.email, settings.nickname || null, userId]
+            );
+            return (result as any).affectedRows > 0;
+        } finally {
+            connection.release();
+        }
+    },
+
+    async updatePassword(userId: string, hashedPassword: string) {
+        const connection = await pool.getConnection();
+        try {
+            const [result] = await connection.execute(
+                'UPDATE users SET password = ? WHERE id = ?',
+                [hashedPassword, userId]
+            );
+            return (result as any).affectedRows > 0;
+        } finally {
+            connection.release();
+        }
+    },
+
+    async findById(userId: string) {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT * FROM users WHERE id = ?',
+                [userId]
+            );
+            return (rows as any)[0];
+        } finally {
+            connection.release();
+        }
+    },
+
+    async updateAvatar(userId: string, avatarUrl: string) {
+        const connection = await pool.getConnection();
+        try {
+            const [result] = await connection.execute(
+                'UPDATE users SET avatar = ? WHERE id = ?',
+                [avatarUrl, userId]
+            );
+            return (result as any).affectedRows > 0;
         } finally {
             connection.release();
         }
