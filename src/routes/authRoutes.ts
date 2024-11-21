@@ -107,4 +107,39 @@ router.get('/me', async (req, res) => {
     }
 });
 
+// 新增 refreshToken 路由
+router.post('/refresh-token', async (req, res) => {
+    try {
+        const oldToken = req.headers.authorization?.split(' ')[1];
+
+        if (!oldToken) {
+            return res.status(401).json({message: '未提供token'});
+        }
+
+        try {
+            // 验证旧token
+            const decoded = jwt.verify(oldToken, process.env.JWT_SECRET || 'your-secret-key', {
+                ignoreExpiration: true // 忽略过期检查
+            }) as JwtPayload;
+
+            // 生成新token
+            const newToken = jwt.sign(
+                {
+                    id: decoded.id,
+                    username: decoded.username
+                },
+                process.env.JWT_SECRET || 'your-secret-key',
+                {expiresIn: '24h'}
+            );
+
+            res.json({token: newToken});
+        } catch (error) {
+            return res.status(401).json({message: '无效的token'});
+        }
+    } catch (error) {
+        logger.error('刷新token失败:', error);
+        res.status(500).json({message: '刷新token失败'});
+    }
+});
+
 export default router;
