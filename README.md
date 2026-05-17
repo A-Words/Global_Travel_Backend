@@ -85,7 +85,7 @@ workflow 的部署任务绑定到 `production` Environment。请在 GitHub 仓�
 ```env
 PORT=3000
 
-DB_HOST=localhost
+DB_HOST=host.docker.internal
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME_HERITAGE=global_travel
@@ -101,7 +101,7 @@ SPARK_DOMAIN=general
 
 说明：
 
-- `DB_*` 用于连接 MySQL。
+- `DB_*` 用于连接 MySQL。Docker 部署时，如果 MySQL 暴露在宿主机端口上，推荐使用 `DB_HOST=host.docker.internal`；compose 已通过 `host-gateway` 为 Linux 服务器配置该主机名。
 - `JWT_SECRET` 用于签发和校验登录 Token。
 - `SPARK_*` 用于调用讯飞星火大模型生成行程。
 - 如果数据库连接失败，文化遗产查询会使用本地 JSON 数据；用户和行程相关能力仍依赖数据库。
