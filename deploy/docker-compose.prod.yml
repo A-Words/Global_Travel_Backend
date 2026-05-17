@@ -1,0 +1,15 @@
+services:
+  traveler-backend:
+    image: ${IMAGE_NAME}
+    container_name: traveler-backend
+    restart: unless-stopped
+    env_file:
+      - ${ENV_FILE:-.env}
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - ${LOGS_DIR:-./logs}:/app/logs
+      - ${UPLOADS_DIR:-./uploads}:/app/uploads

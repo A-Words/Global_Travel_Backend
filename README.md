@@ -38,6 +38,46 @@ npm run build
 npm start
 ```
 
+## Docker 部署
+
+本仓库包含基于 GitHub Actions 的 Docker 打包和自动部署流程：
+
+- `Dockerfile`: 多阶段构建生产镜像。
+- `deploy/docker-compose.prod.yml`: 服务器上的生产编排文件。
+- `.github/workflows/docker-deploy.yml`: 推送到 `main` 时构建镜像、推送到 GHCR，并在配置服务器信息后自动部署。
+
+本地构建镜像：
+
+```bash
+docker build -t traveler-backend .
+```
+
+本地使用 compose 启动：
+
+```bash
+IMAGE_NAME=traveler-backend ENV_FILE=../.env LOGS_DIR=../logs UPLOADS_DIR=../uploads APP_PORT=3000 docker compose -f deploy/docker-compose.prod.yml up -d
+```
+
+### GitHub Secrets
+
+在 GitHub 仓库的 `Settings -> Secrets and variables -> Actions` 中配置：
+
+必填：
+
+- `DEPLOY_HOST`: 服务器地址。
+- `DEPLOY_USER`: SSH 用户名。
+- `DEPLOY_SSH_KEY`: 可登录服务器的 SSH 私钥。
+
+可选：
+
+- `DEPLOY_PORT`: SSH 端口，默认 `22`。
+- `DEPLOY_PATH`: 服务器部署目录，默认 `/opt/traveler-backend`。
+- `APP_PORT`: 宿主机暴露端口，默认 `3000`。
+- `DEPLOY_REGISTRY_USERNAME`: 服务器拉取 GHCR 私有镜像时使用的用户名。
+- `DEPLOY_REGISTRY_TOKEN`: 服务器拉取 GHCR 私有镜像时使用的 token。
+
+服务器部署目录下需要提前准备 `.env`，内容参考下一节环境变量。首次部署时 workflow 会自动上传 `docker-compose.yml` 并创建 `logs`、`uploads/avatars` 目录。
+
 ## 环境变量
 
 在项目根目录创建 `.env`：
