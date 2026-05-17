@@ -58,9 +58,9 @@ docker build -t traveler-backend .
 IMAGE_NAME=traveler-backend ENV_FILE=../.env LOGS_DIR=../logs UPLOADS_DIR=../uploads APP_PORT=3000 docker compose -f deploy/docker-compose.prod.yml up -d
 ```
 
-### GitHub Secrets
+### GitHub Environment Secrets
 
-在 GitHub 仓库的 `Settings -> Secrets and variables -> Actions` 中配置：
+workflow 的部署任务绑定到 `production` Environment。请在 GitHub 仓库的 `Settings -> Environments -> production -> Environment secrets` 中配置：
 
 必填：
 
