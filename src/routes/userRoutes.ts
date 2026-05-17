@@ -2,7 +2,7 @@ import express from 'express';
 import {userModel} from '../models/user';
 import {logger} from '../config/logger';
 import {authenticateToken} from '../middleware/auth';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
 

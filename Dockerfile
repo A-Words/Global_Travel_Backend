@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-FROM node:24-bookworm-slim AS runtime
+FROM node:24-alpine AS runtime
 
 ENV NODE_ENV=production
 WORKDIR /app
@@ -19,9 +19,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-COPY --from=build /app/dist ./dist
+COPY --from=build --chown=node:node /app/dist ./dist
 
-RUN mkdir -p logs uploads/avatars && chown -R node:node /app
+RUN mkdir -p logs uploads/avatars && chown node:node logs uploads uploads/avatars
 
 USER node
 
